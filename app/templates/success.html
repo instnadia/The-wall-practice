@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <span class="navbar-brand mb-0 h1">Coding dojo wall</span>
+        <p>Welcome {{user.first_name}}</p>
+        <a href="/logout">log-out</a>
+    </nav>
+
+    <div class="container">
+        <div class="text-danger">
+            {%if messages%}
+            <ul class="list-unstyled d-inline-block">
+                {%for message in messages%}
+                <li class="text-left">
+                    {{ message }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        <form action="/messages/new" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Enter a message:</label>
+                <textarea class="form-control" name="message" rows="3"></textarea>
+            </div>
+            <button class="btn btn-info">Submit</button>
+        </form>
+        {%for m in all_messages %}
+            <div class="card mt-5">
+                <div class="card-header">
+                    {{m.user_posted.first_name}} {{m.user_posted.last_name}} - {{m.created_at}}
+                </div>
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                        <p>{{m.message}}</p>
+                    </blockquote>
+                    <form action="/message/like/{{m.id}}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-info">LIKE</button>
+                    </form>
+                </div>
+                {% for c in m.comments.all %}
+                    <div class="card mt-5 pl-5">
+                        <div class="card-header">
+                            {{c.user_posted.first_name}} {{c.user_posted.last_name}} - {{c.created_at}}
+                        </div>
+                        <div class="card-body">
+                            <blockquote class="blockquote mb-0">
+                                <p>{{c.comment}}</p>
+                            </blockquote>
+                        </div>
+                    </div>
+                {%endfor%}
+            </div>
+            <form action="/comments/new/{{m.id}}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Enter a comment:</label>
+                    <textarea class="form-control" name="comment" rows="3"></textarea>
+                </div>
+                <button class="btn btn-info">Submit</button>
+            </form>
+        {%endfor%}
+    </div>
+</body>
+
+</html>
